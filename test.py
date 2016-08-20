@@ -6,14 +6,15 @@ Created on Jul 19, 2014
 import array
 import string
 
+from blocks import BLOCKS, PLANET_NAMES
 from encryption import decryptor
 import util
-
-
+import sys
+from pprint import pprint
 
 
 def main():
-    starsFile = "../../../../games/stars27j/games/test3.r1"
+    starsFile = sys.argv[1]
 #     starsFile = "../../../../games/stars27j/games/difficultattempt.h1"
 #     starsFile = "../../../../games/stars27j/games/Game.xy"
 #     starsFile = "../../../../games/stars27j/games/Game.h1"
@@ -26,10 +27,24 @@ def main():
     # Now do great and amazing things with the blocks!
     print "Printing detected blocks:"
     for block in blocks:
-        print block
-        if block.typeId == 7:
-            print block.planets
-            print (bin(block.gameSettings)[2:] ).zfill(16)
+        if block.typeId not in BLOCKS:
+            print 'Unknown block:', block.typeId
+            continue
+        #print BLOCKS[block.typeId], block.typeId
+        if block.typeId in [13, 14]:
+            if block['PlanetIDAndOwnerID']['OwnerID'] == 0:
+                print PLANET_NAMES[block['PlanetIDAndOwnerID']['PlanetID']], block.typeId
+                #print block['CurrentGravity']
+                #print block['CurrentTemperature']
+                #print block['CurrentRadiation']
+                pprint(block.params)
+                if 'Installations' in block.params:
+                    p = block['Installations']
+                    print 'Mines: %s Factories: %s' % (p['Mines'], p['Factories'])
+        
+        #if block.typeId == 7:
+        #    print block.planets
+        #    #print (bin(block.gameSettings)[2:] ).zfill(16)
             
 
     # Test race passwords and hashing

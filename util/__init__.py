@@ -12,11 +12,20 @@ The bytes are swapped because the byte stream is little endian
 import itertools
 import string
 
+def read8(byteArray, byteIndex):
+    return byteArray[byteIndex]
+
+
 
 def read16(byteArray, byteIndex):
-    
     return (byteArray[byteIndex+1] << 8) | byteArray[byteIndex]
 
+def readN(byteArray, byteIndex, byteCount):
+    result = 0
+    for byte in xrange(byteCount):
+        print byte
+        result = byteArray[byteIndex + byte] << 8*byte | result
+    return result
 
 """
 Reads a 32 bit integer from a byte array.

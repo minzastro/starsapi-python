@@ -5,7 +5,6 @@ the key
 This list will be used to instantiate a class of the same name as a
 decoder of the blocks found in a Stars! game file 
 '''
-import traceback
 
 from blocks.Block import Block
 
