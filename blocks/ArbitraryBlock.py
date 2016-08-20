@@ -83,16 +83,11 @@ class ArbitraryBlock(Block):
                     #print self.params, self.typeId
                     raise Exception('Unknown type: %s' % attrib['type'])
             else:
-                if bytez == 2:
-                    content = read16(self.data, self.offset)
-                    self.offset += 2
-                elif bytez == 1:
-                    content = read8(self.data, self.offset)
-                    self.offset += 1
-                else:
+                if bytez > 0:
                     content = readN(self.data, self.offset, bytez)
                     self.offset += bytez
-                    
+                else:
+                    return                    
         print "$", content, "$"
         if tag in self.params and type(self.params[tag]) == dict:
             self.params[tag][''] = content
