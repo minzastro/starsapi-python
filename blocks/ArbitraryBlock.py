@@ -6,6 +6,7 @@ Created on Thu Aug 18 18:29:36 2016
 @author: mints
 """
 from util import *
+from util.strings import decodeBytesForStarsString
 from blocks.Block import Block
 from lxml import etree
 from os import path
@@ -71,39 +72,55 @@ class ArbitraryBlock(Block):
     def read_element(self, element):
         attrib = element.attrib
         tag = element.tag    
-        print tag, attrib,
+        #print tag, attrib,
+        multirow = False
+        multirow_count = 1
         if 'bytes' in attrib:
             bytez = int(evaluate(self.params, attrib['bytes']))
-            print bytez
+            #print bytez
+            if 'repeat' in attrib:
+                multirow = True
+                repeat = attrib['repeat'].replace('{bytes}', str(len(self.data)))
+                repeat = evaluate(self.params, repeat)
+                multirow_count = int(repeat)
             if 'type' in attrib:
                 if attrib['type'] == 'text' or attrib['type'] == 'StarsText':
-                    content = str(self.data[self.offset:self.offset+bytez])
+                    content = decodeBytesForStarsString(self.data[self.offset:self.offset+bytez])
                     self.offset += bytez
                 else:
                     #print self.params, self.typeId
                     raise Exception('Unknown type: %s' % attrib['type'])
             else:
                 if bytez > 0:
-                    content = readN(self.data, self.offset, bytez)
-                    self.offset += bytez
+                    content = readN(self.data, self.offset, bytez*multirow_count)
+                    self.offset += bytez*multirow_count
                 else:
                     return                    
-        print "$", content, "$"
+        #print "$", content, "$"
         if tag in self.params and type(self.params[tag]) == dict:
             self.params[tag][''] = content
         else:
             self.params[tag] = content
         kids = {'': content}
         ind = 0
-        for child in element.getchildren()[::-1]:
-            #print '-'*5, '>', child.tag, child.attrib, bytez
-            if 'bits' in child.attrib:
-                bits = int(child.attrib['bits'])
-            else:
-                bits = int(child.attrib['Bits'])            
-            kids[child.tag] = get_bits(content, int(bytez)*8, ind, bits)
-            print child.tag, kids[child.tag]
-            ind += bits
+        for _ in xrange(multirow_count):
+            for child in element.getchildren()[::-1]:
+                #print '-'*5, '>', child.tag, child.attrib, bytez
+                if 'bits' in child.attrib:
+                    bits = int(child.attrib['bits'])
+                else:
+                    bits = int(child.attrib['Bits'])
+                kid_data = get_bits(content, int(bytez*multirow_count)*8, 
+                                    ind, bits)
+                if multirow:
+                    if child.tag in kids:
+                        kids[child.tag].append(kid_data)
+                    else:
+                        kids[child.tag] = [kid_data]
+                else:
+                    kids[child.tag] = kid_data
+                #print child.tag, kids[child.tag]
+                ind += bits
         if ind > 0:
             if type(self.params[tag]) == dict:
                 self.params[tag].update(kids)

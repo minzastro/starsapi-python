@@ -23,7 +23,6 @@ def read16(byteArray, byteIndex):
 def readN(byteArray, byteIndex, byteCount):
     result = 0
     for byte in xrange(byteCount):
-        print byte
         result = byteArray[byteIndex + byte] << 8*byte | result
     return result
 

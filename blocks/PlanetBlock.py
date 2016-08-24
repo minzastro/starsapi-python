@@ -20,13 +20,13 @@ class PlanetBlock(Block):
         Block.__init__(self, typeId, size, data)
         b = ArbitraryBlock(typeId, size, data)
         b.parse()
-        print b.params
+        #print b.params
         self.planetNumber = (data[0] & 0xFF) + ((data[1] & 7) << 8)
         self.name = PLANET_NAMES[self.planetNumber]
         self.owner = (data[1] & 0xF8) >> 3
-        print self.planetNumber, self.owner
+        #print self.planetNumber, self.owner
         boo = read16(data, 0)
-        print get_bits(boo, 16, 0, 5), get_bits(boo, 16, 5, 11)
+        #print get_bits(boo, 16, 0, 5), get_bits(boo, 16, 5, 11)
         
         if self.owner == 31:
             self.owner = -1

@@ -58,7 +58,6 @@ class PlanetsBlock(Block):
         # previous planet in the list is stored...  Also, the X coordinate starts
         # at 1000 as shown in the Stars! viewer.  Oddities everywhere!
         x = 1000
-            
         for i in xrange(self.planetCount):
             planetData = read32(data, i*4)
              

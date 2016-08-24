@@ -6,10 +6,8 @@ Created on Jul 7, 2014
 import logging
 
 import util
-import blocks
 from blocks.FileHeaderBlock import FileHeaderBlock
 from blocks.PlanetsBlock import PlanetsBlock
-from blocks.PlanetBlock import PlanetBlock
 from blocks.ArbitraryBlock import ArbitraryBlock
 loggingLevel = logging.INFO
 #loggingLevel = logging.DEBUG
@@ -217,20 +215,21 @@ def readFile(starsFile):
             block = FileHeaderBlock(typeId, size, data)
             decryptor.initDecryption(block.salt, block.gameId, block.turn, block.playerIndex, block.shareware)
         # Everything else needs to be decrypted
+        elif typeId == 7:
+            decryptedData = decryptor.decryptBytes(data)
+            block = PlanetsBlock(typeId, size, decryptedData)
+            # A whole bunch of planets data is tacked onto the end of this block
+            # We need to determine how much and parse it
+            length = block.planetCount * 4  # 4 bytes per planet
+            block.parsePlanetsData(fileBytes[offset:offset+length])
+            # Adjust our offset to after the planet data
+            offset = offset + length
         else:
             decryptedData = decryptor.decryptBytes(data)
             logging.debug("decrypted data:\n%s" % (list(decryptedData)))
             block = ArbitraryBlock(typeId, size, decryptedData)
             block.parse()
             # PlanetsBlock is an exception in that it has more data tacked onto the end
-            #if typeId == 7:
-            #    block = PlanetsBlock(typeId, size, decryptedData)
-            #    # A whole bunch of planets data is tacked onto the end of this block
-            #    # We need to determine how much and parse it
-            #    length = block.planetCount * 4  # 4 bytes per planet
-            #    block.parsePlanetsData(fileBytes[offset:offset+length])
-            #    # Adjust our offset to after the planet data
-            #    offset = offset + length
             #elif typeId == 14:
             #    block = PlanetBlock(typeId, size, decryptedData)
             #else:
