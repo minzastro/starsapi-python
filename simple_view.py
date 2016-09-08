@@ -14,7 +14,7 @@ from pprint import pprint
 game_name = sys.argv[1]
 
 planets = []
-xy_blocks = decryptor.readFile(game_name + '.xy')
+xy_blocks = decryptor.readFile(game_name + '.XY')
 for block in xy_blocks:
     if block.typeId == 7:
         planets = {pl['id']: pl['name'] for pl in block.planets}
@@ -23,7 +23,7 @@ game_data = decryptor.readFile(game_name + '.M1')
 for block in game_data:
     if block.typeId in [13, 14]:
         if block['PlanetIDAndOwnerID']['OwnerID'] == 0:
-            print planets[block['PlanetIDAndOwnerID']['PlanetID']], block.typeId
+            print planets[block['PlanetIDAndOwnerID']['PlanetID']]
             #pprint(block.params)
             if 'Installations' in block.params:
                 p = block['Installations']
