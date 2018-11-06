@@ -27,10 +27,18 @@ for block in game_data:
             #pprint(block.params)
             if 'Installations' in block.params:
                 p = block['Installations']
-                print 'Mines: %s Factories: %s' % (p['Mines'], p['Factories'])
+                print ' '*4, 'Mines: %s Factories: %s' % (p['Mines'], p['Factories'])
+                production = p['Factories']*race['FactoryEfficiency']
+                print ' '*4, 'Production %s' % production
+                for element in ['Ironium', 'Boranium', 'Germanium']:
+                    print ' '*4, '-'*5, element, '-'*5
+                    concentration = block['%sConcentration' % element]
+                    mining_rate = p['Mines']*race['MiningEfficiency']*concentration * 0.01
+                    print ' '*6, 'On surface %6d' % block['Surface%s' % element], ' Mining %5d' % mining_rate, ' Conentration %3d' % concentration
         pass
     elif block.typeId == 26:
         pp = block.params
+        pprint(pp)
         print pp['Name']
         p = pp['ShipSlot']
         for i in xrange(pp['SlotCount']):
@@ -48,10 +56,5 @@ for block in game_data:
             else:
                 print '-'*5, itemCat, itemId, 
             print itemCount
-
-            
-        
-    #else:
-    #    print BLOCKS[block.typeId]
-    
-            
+    elif block.typeId == 6:
+        race = block.params
